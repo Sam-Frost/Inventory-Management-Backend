@@ -1,0 +1,111 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+
+// Add constraints at a database level, like min length for username and stuff
+
+model Admin {
+  id            Int      @id @default(autoincrement())
+  username      String   @unique
+  password      String
+  location      String
+  name          String
+  refreshToken  String? 
+}
+
+model Employee {
+  empId       Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  name        String   
+  phoneNumber String   @unique   
+  position    String
+  password    String
+  location    String
+  @@unique([location, name], name: "unique_location_name") 
+  assignedItem AssignedItem[]
+  assignedItemRecords AssignedItemRecord[]
+  approval Approval[]
+  defectiveItem DefectiveItem[]
+}
+
+model Item {
+  itemId      Int      @id @default(autoincrement())
+  createdAt   DateTime @default(now())
+  itemName    String   
+  partNumber  String    
+  location    String
+  quantity    Int
+  price       Int
+  @@unique([location, partNumber], name: "unique_location_partNumber")
+  @@unique([location, itemName], name: "unique_location_itemName")
+  @@unique([location, itemName, partNumber], name: "unique_location_itemName_partNumber")
+  assignedItem AssignedItem[]
+  assignedItemRecords AssignedItemRecord[]
+  approval Approval[]
+  defectiveItem DefectiveItem[]
+}
+
+model AssignedItem {
+  assignmentId  Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  empId         Int
+  itemId        Int
+  quantity      Int
+  location      String
+  @@unique([empId, itemId], name: "unique_empId_itemID")
+  employee      Employee  @relation(fields: [empId], references: [empId])
+  item          Item      @relation(fields: [itemId], references: [itemId])
+
+}
+
+model AssignedItemRecord {
+  assignmentId  Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  empId         Int
+  itemId        Int
+  quantity      Int
+  location      String
+  employee      Employee  @relation(fields: [empId], references: [empId])
+  item          Item      @relation(fields: [itemId], references: [itemId])
+}
+
+model Approval {
+  approvalId    Int      @id @default(autoincrement())
+  createdAt     DateTime @default(now())
+  empId         Int
+  itemId        Int
+  status        String
+  requestNumber String 
+  quantity      Int
+  location      String
+  employee      Employee  @relation(fields: [empId], references: [empId])
+  item          Item      @relation(fields: [itemId], references: [itemId])
+}
+
+model DefectiveItem {
+  defectiveItemId   Int       @id @default(autoincrement())
+  createdAt         DateTime  @default(now())
+  itemId            Int
+  empId             Int
+  quantity          Int
+  location          String
+  employee          Employee  @relation(fields: [empId], references: [empId])
+  item              Item      @relation(fields: [itemId], references: [itemId])
+}
+
+enum ApprovalStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+enum Location {
+  GURGAON
+  FARIDABAD
+}
