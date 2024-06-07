@@ -51,7 +51,8 @@ function readAdmin(username, password) {
             }
         }
         catch (error) {
-            console.log("Error occuerds in  reading admin from the database");
+            console.log("Error occuerds in  reading admin from the database. NOW PRITING ERROR");
+            console.log(error);
             return {
                 code: httpStatusCodes_1.HttpStatus.INTERNAL_SERVER_ERROR,
                 data: { message: "Error occured while trying to read data!" }
