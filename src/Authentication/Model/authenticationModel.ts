@@ -53,6 +53,7 @@ export async function readAdmin(username: string, password: string): Promise<Dat
         
     } catch (error) {
     console.log("Error occuerds in  reading admin from the database")
+    console.log(error)
 
         return {
             code: HttpStatus.INTERNAL_SERVER_ERROR,
