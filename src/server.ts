@@ -58,7 +58,7 @@ app.get('/', function (req: Request, res: Response) {
     // res.json({ response });
     // res.json({token})
     // asda asdas s asdasd 
-    // UPDATED CODE BRUH
+    // UPDATED CODE BRUH TRIGERING NOW FROM THE GITGHUB
 
     res.json({msg: "All good"});
 
