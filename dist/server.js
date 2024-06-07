@@ -39,7 +39,8 @@ app.use('/item', authMiddleware_1.authMiddleware, itemRoutes_1.default);
 app.use('/approval', authMiddleware_1.authMiddleware, approvalRoutes_1.default);
 app.use('/defective', authMiddleware_1.authMiddleware, defectiveInventoryRoutes_1.default);
 app.use('/assignedItem', authMiddleware_1.authMiddleware, assignedItemsRoutes_1.default);
-app.get('/', authMiddleware_1.authMiddleware, function (req, res) {
+// app.get('/', authMiddleware,  function (req: Request, res: Response) {
+app.get('/', function (req, res) {
     // const token: string = generateAccessToken({id: 1,
     //     username: "sam", 
     //     location: "gugaon",
@@ -55,7 +56,9 @@ app.get('/', authMiddleware_1.authMiddleware, function (req, res) {
     // console.log(tokenData)
     // res.json({ response });
     // res.json({token})
-    res.json({ msg: "A;; good" });
+    // asda asdas s asdasd 
+    // UPDATED CODE BRUH TRIGERING NOW FROM THE GITGHUB
+    res.json({ msg: "All good" });
 });
 app.get('/delete', function (req, res) {
     return __awaiter(this, void 0, void 0, function* () {
