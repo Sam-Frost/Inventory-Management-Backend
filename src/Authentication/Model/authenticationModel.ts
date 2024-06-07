@@ -52,7 +52,8 @@ export async function readAdmin(username: string, password: string): Promise<Dat
         }
         
     } catch (error) {
-    console.log("Error occuerds in  reading admin from the database")
+
+    console.log("Error occuerds in  reading admin from the database. NOW PRITING ERROR")
     console.log(error)
 
         return {
