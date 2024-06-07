@@ -38,7 +38,8 @@ app.use('/defective', authMiddleware, defectiveInventoryRouter);
 app.use('/assignedItem', authMiddleware, assignedItemRouter);
 
 
-app.get('/', authMiddleware,  function (req: Request, res: Response) {
+// app.get('/', authMiddleware,  function (req: Request, res: Response) {
+app.get('/', function (req: Request, res: Response) {
     // const token: string = generateAccessToken({id: 1,
     //     username: "sam", 
     //     location: "gugaon",
@@ -56,7 +57,7 @@ app.get('/', authMiddleware,  function (req: Request, res: Response) {
     // console.log(tokenData)
     // res.json({ response });
     // res.json({token})
-    res.json({msg: "A;; good"});
+    res.json({msg: "All good"});
 
     
 
