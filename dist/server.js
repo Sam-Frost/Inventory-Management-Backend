@@ -37,6 +37,8 @@ const corsOptions = {
     credentials: true,
 };
 app.use((0, cors_1.default)(corsOptions));
+// Enable pre-flight for all routes
+app.options('*', (0, cors_1.default)(corsOptions));
 app.use('/auth', authenticationRouter_1.default);
 app.use('/employee', authMiddleware_1.authMiddleware, employeeRoutes_1.default);
 app.use('/item', authMiddleware_1.authMiddleware, itemRoutes_1.default);

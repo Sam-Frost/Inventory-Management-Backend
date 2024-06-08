@@ -36,6 +36,10 @@ const corsOptions = {  // Replace with your frontend URL
   
 app.use(cors(corsOptions))
 
+
+// Enable pre-flight for all routes
+app.options('*', cors(corsOptions));
+
 app.use('/auth', authenticationRouter)
 app.use('/employee', authMiddleware, employeeRouter);
 app.use('/item', authMiddleware, itemRouter);
