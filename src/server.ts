@@ -15,6 +15,11 @@ import cors from 'cors';
 import { decodeToken, generateAccessToken, isTokenSignatureValid } from './Authentication/Service/authenticationService';
 import { authMiddleware } from './middleware/authMiddleware'
 
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
 const PORT: number = 3000;
 
 const app = express();
@@ -23,7 +28,7 @@ app.use(cookieParser());
 app.use(express.json());
 
 const corsOptions = {  // Replace with your frontend URL
-    origin: 'http://localhost:5173',
+    origin: process.env.FRONTEND_URL,
     credentials: true,
   };
 
