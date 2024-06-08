@@ -28,7 +28,8 @@ app.use(cookieParser());
 app.use(express.json());
 
 const corsOptions = {  // Replace with your frontend URL
-    origin: process.env.FRONTEND_URL,
+    // origin: process.env.FRONTEND_URL,
+    origin: '*',
     credentials: true,
   };
 
