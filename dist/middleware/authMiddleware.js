@@ -37,6 +37,7 @@ const jwt = __importStar(require("jsonwebtoken"));
 const authenticationService_1 = require("../Authentication/Service/authenticationService");
 const authenticationModel_1 = require("../Authentication/Model/authenticationModel");
 const httpStatusCodes_1 = require("../lib/httpStatusCodes");
+const constants_1 = require("../constants");
 const SECRET_KEY = 'this_is_my_temporariy_secret_key';
 const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
     console.log("Middleware Reached!");
@@ -77,8 +78,8 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
                 const response = yield refreshAccessToken(accessToken, refreshToken);
                 console.log("Created new refresh token");
                 if (response) {
-                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: false, maxAge: 3600000 });
-                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: false, maxAge: 3600000 });
+                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
+                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
                     // return next();
                     // res.status(201).json({ msg: "Tokens refreshed"})
                     console.log("TOKENS HAVE BEEN SUCCESSSFULLY REFRESHED AND MOVING AHEAD WITH USERS REQUEST");

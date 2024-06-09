@@ -13,6 +13,7 @@ exports.userLogout = exports.userAuthenticated = exports.adminRegister = exports
 const authenticationModel_1 = require("../Model/authenticationModel");
 const authenticationService_1 = require("../Service/authenticationService");
 const httpStatusCodes_1 = require("../../lib/httpStatusCodes");
+const constants_1 = require("../../constants");
 function adminLogin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Login route hit!");
@@ -40,8 +41,8 @@ function adminLogin(req, res) {
                 const accessToken = (0, authenticationService_1.generateAccessToken)(accessTokenPayload);
                 const refreshToken = (0, authenticationService_1.generateRefreshToken)(refreshTokenPayload);
                 yield (0, authenticationModel_1.updateAdminRefreshToken)(id, refreshToken);
-                res.cookie('accessToken', accessToken, { httpOnly: true, secure: false, maxAge: 3600000 });
-                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, maxAge: 3600000 });
+                res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
                 res.status(response.code).json(accessTokenPayload);
             }
             else {
@@ -77,8 +78,8 @@ function adminRegister(req, res) {
                 name: user.name
             };
             const accessToken = (0, authenticationService_1.generateAccessToken)(payload);
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: false, maxAge: 3600000 });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, maxAge: 3600000 });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
             res.status(response.code).json(payload);
         }
     });
@@ -94,8 +95,8 @@ exports.userAuthenticated = userAuthenticated;
 ;
 function userLogout(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        res.clearCookie('refreshToken', { path: '/', httpOnly: true, secure: true });
-        res.clearCookie('accessToken', { path: '/', httpOnly: true, secure: true });
+        res.clearCookie('refreshToken', { path: '/', httpOnly: true, secure: constants_1.IS_COOKIE_SECURE });
+        res.clearCookie('accessToken', { path: '/', httpOnly: true, secure: constants_1.IS_COOKIE_SECURE });
         res.status(httpStatusCodes_1.HttpStatus.OK).send({ message: 'User logged out!' });
     });
 }

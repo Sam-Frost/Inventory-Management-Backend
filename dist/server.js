@@ -34,6 +34,8 @@ app.use(express_1.default.json());
 const corsOptions = {
     origin: process.env.FRONTEND_URL,
     // origin: '*',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true,
 };
 app.use((0, cors_1.default)(corsOptions));
