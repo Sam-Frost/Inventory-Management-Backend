@@ -41,8 +41,8 @@ function adminLogin(req, res) {
                 const accessToken = (0, authenticationService_1.generateAccessToken)(accessTokenPayload);
                 const refreshToken = (0, authenticationService_1.generateRefreshToken)(refreshTokenPayload);
                 yield (0, authenticationModel_1.updateAdminRefreshToken)(id, refreshToken);
-                res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
-                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
+                res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
                 res.status(response.code).json(accessTokenPayload);
             }
             else {
@@ -78,8 +78,8 @@ function adminRegister(req, res) {
                 name: user.name
             };
             const accessToken = (0, authenticationService_1.generateAccessToken)(payload);
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
             res.status(response.code).json(payload);
         }
     });

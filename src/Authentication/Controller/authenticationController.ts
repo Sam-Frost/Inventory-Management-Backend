@@ -44,8 +44,8 @@ export async function adminLogin(req: Request, res: Response) {
 
             await updateAdminRefreshToken(id, refreshToken)
 
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000 });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'    });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'  });
             res.status(response.code).json(accessTokenPayload);
 
         } else {
@@ -91,8 +91,8 @@ export async function adminRegister(req: Request, res: Response) {
 
             const accessToken = generateAccessToken(payload);  
 
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000 });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'  });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'   });
       
             res.status(response.code).json(payload);
         

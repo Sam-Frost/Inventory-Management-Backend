@@ -78,8 +78,8 @@ const authMiddleware = (req, res, next) => __awaiter(void 0, void 0, void 0, fun
                 const response = yield refreshAccessToken(accessToken, refreshToken);
                 console.log("Created new refresh token");
                 if (response) {
-                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
-                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000 });
+                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
+                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
                     // return next();
                     // res.status(201).json({ msg: "Tokens refreshed"})
                     console.log("TOKENS HAVE BEEN SUCCESSSFULLY REFRESHED AND MOVING AHEAD WITH USERS REQUEST");
