@@ -4,6 +4,7 @@ import { decodeToken, generateAccessToken, generateRefreshToken } from '../Servi
 import { Payload } from '../Service/authenticationService'
 import * as jwt from 'jsonwebtoken'
 import { HttpStatus } from '../../lib/httpStatusCodes';
+import { IS_COOKIE_SECURE } from '../../constants';
 
 export async function adminLogin(req: Request, res: Response) {
     console.log("Login route hit!")
@@ -43,8 +44,8 @@ export async function adminLogin(req: Request, res: Response) {
 
             await updateAdminRefreshToken(id, refreshToken)
 
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: false, maxAge: 3600000  });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, maxAge: 3600000 });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000 });
             res.status(response.code).json(accessTokenPayload);
 
         } else {
@@ -90,8 +91,8 @@ export async function adminRegister(req: Request, res: Response) {
 
             const accessToken = generateAccessToken(payload);  
 
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: false, maxAge: 3600000 });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: false, maxAge: 3600000  });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000 });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
       
             res.status(response.code).json(payload);
         
@@ -105,8 +106,8 @@ export async function userAuthenticated(req: Request, res: Response) {
 
 
 export async function userLogout(req: Request, res: Response) {
-    res.clearCookie('refreshToken', { path: '/', httpOnly: true, secure: true });
-    res.clearCookie('accessToken', { path: '/', httpOnly: true, secure: true });
+    res.clearCookie('refreshToken', { path: '/', httpOnly: true, secure: IS_COOKIE_SECURE });
+    res.clearCookie('accessToken', { path: '/', httpOnly: true, secure: IS_COOKIE_SECURE });
     res.status(HttpStatus.OK).send({message: 'User logged out!'})
 
 };

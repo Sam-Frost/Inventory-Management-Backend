@@ -5,6 +5,7 @@ import { getAdminRefreshToken, updateAdminRefreshToken } from '../Authentication
 
 import { Payload } from '../Authentication/Service/authenticationService'
 import { HttpStatus } from '../lib/httpStatusCodes';
+import { IS_COOKIE_SECURE } from '../constants';
 
 
 const SECRET_KEY = 'this_is_my_temporariy_secret_key'
@@ -65,8 +66,8 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
 
                 if (response) {
-                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: false, maxAge: 3600000  });
-                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: false, maxAge: 3600000  });
+                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
                     // return next();
                     // res.status(201).json({ msg: "Tokens refreshed"})
                     console.log("TOKENS HAVE BEEN SUCCESSSFULLY REFRESHED AND MOVING AHEAD WITH USERS REQUEST")
