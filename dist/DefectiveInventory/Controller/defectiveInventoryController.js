@@ -10,22 +10,87 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefectiveInventory = exports.createDefectiveInventory = void 0;
-const defectiveInventoryModel_1 = require("../Model/defectiveInventoryModel");
-const itemModel_1 = require("../../Item/Model/itemModel");
+// import { addDefectiveItem, readDefectiveInventory } from '../Model/defectiveInventoryModel';
+const db_1 = require("../../lib/db");
+const httpStatusCodes_1 = require("../../lib/httpStatusCodes");
 function createDefectiveInventory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const itemName = req.body.itemName.toLowerCase();
-        const employeeName = req.body.employeeName.toLowerCase();
+        // const itemName: string = req.body.itemName.toLowerCase();
+        const itemName = req.body.itemName;
+        const employeeName = req.body.employeeName;
+        // const employeeName: string = req.body.employeeName.toLowerCase();
         const quantity = req.body.quantity;
         const location = req.body.location;
+        console.log("WORKING IN DEFECTIVE INVENTORY");
+        console.log(itemName);
         try {
-            const item = (0, itemModel_1.readItemByName)(itemName, location);
-            const response = yield (0, defectiveInventoryModel_1.addDefectiveItem)(itemId, empId, quantity, location);
+            console.log("STEP 1");
+            const item = yield db_1.prisma.item.findUnique({
+                where: {
+                    unique_location_itemName: {
+                        itemName: itemName,
+                        location: location
+                    }
+                }
+            });
+            if (!item) {
+                return res.status(httpStatusCodes_1.HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: "Item not found!" });
+            }
+            console.log("STEP 2");
+            const employee = yield db_1.prisma.employee.findUnique({
+                where: {
+                    unique_location_name: {
+                        name: employeeName,
+                        location: location
+                    }
+                }
+            });
+            if (!employee) {
+                return res.status(httpStatusCodes_1.HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: "Employee not found!" });
+            }
+            console.log("STEP 3");
+            // Check if the item has the item is assigned to them, and as quantity greater than than assigned wuantity
+            const itemAssigned = yield db_1.prisma.assignedItem.findUnique({
+                where: {
+                    unique_empId_itemID: {
+                        empId: employee.empId,
+                        itemId: item.itemId
+                    }
+                }
+            });
+            if (!itemAssigned) {
+                return res.status(httpStatusCodes_1.HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: "Item not assigned to employee!" });
+            }
+            if (quantity < itemAssigned.quantity) {
+                return res.status(httpStatusCodes_1.HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: "Quantity being returned is more than the quantity assigned!" });
+            }
+            const response = yield db_1.prisma.$transaction([
+                db_1.prisma.defectiveItem.create({
+                    data: {
+                        empId: employee.empId,
+                        itemId: item.itemId,
+                        quantity: quantity,
+                        location: location
+                    }
+                }),
+                db_1.prisma.assignedItem.update({
+                    where: {
+                        unique_empId_itemID: {
+                            empId: employee.empId,
+                            itemId: item.itemId
+                        }
+                    },
+                    data: {
+                        quantity: { decrement: quantity }
+                    }
+                })
+            ]);
             if (response) {
-                return res.status(response.code).json(response);
+                return res.status(httpStatusCodes_1.HttpStatus.CREATED).json({ msg: "Defective Inventory Succesfully Added!" });
             }
         }
         catch (err) {
+            return res.status(httpStatusCodes_1.HttpStatus.INTERNAL_SERVER_ERROR).json({ msg: "Internal error!" });
         }
     });
 }
@@ -33,15 +98,15 @@ exports.createDefectiveInventory = createDefectiveInventory;
 ;
 function getDefectiveInventory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        // Return the deatils of the employee(Along with all the items assigned!)
-        if (req.params.location) {
-            const location = req.params.location;
-            const response = yield (0, defectiveInventoryModel_1.readDefectiveInventory)(location);
-            res.status(response.code).send(response.data);
-        }
-        else {
-            console.log("No location provided!");
-        }
+        // // Return the deatils of the employee(Along with all the items assigned!)
+        // if (req.params.location) {
+        //     const location: string = req.params.location;
+        //     const response = await readDefectiveInventory(location)
+        //     res.status(response.code).send(response.data)
+        // }
+        // else {
+        //     console.log("No location provided!")
+        // }
     });
 }
 exports.getDefectiveInventory = getDefectiveInventory;
