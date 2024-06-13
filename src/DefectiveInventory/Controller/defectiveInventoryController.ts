@@ -1,18 +1,29 @@
 import { Request, Response } from 'express';
 import { addDefectiveItem, readDefectiveInventory } from '../Model/defectiveInventoryModel';
+import { readItemByName } from '../../Item/Model/itemModel';
 
 export async function createDefectiveInventory(req: Request, res: Response) {
 
-    const itemId: number = req.body.itemId;
-    const empId: number = req.body.empId;
+    const itemName: string = req.body.itemName.toLowerCase();
+    const employeeName: string = req.body.employeeName.toLowerCase();
     const quantity: number = req.body.quantity;
     const location: string = req.body.location;
 
-    const response = await addDefectiveItem(itemId, empId, quantity, location);
+    try {
 
-    if (response) {
-        res.status(response.code).json(response);
+        const item = readItemByName(itemName, location)
+
+        const response = await addDefectiveItem(itemId, empId, quantity, location);
+        
+        if (response) {
+           return res.status(response.code).json(response);
+        }
+    
+    } catch (err ) {
+        
     }
+
+    
   
 };
 

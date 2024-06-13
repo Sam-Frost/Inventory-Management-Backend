@@ -11,15 +11,21 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.getDefectiveInventory = exports.createDefectiveInventory = void 0;
 const defectiveInventoryModel_1 = require("../Model/defectiveInventoryModel");
+const itemModel_1 = require("../../Item/Model/itemModel");
 function createDefectiveInventory(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
-        const itemId = req.body.itemId;
-        const empId = req.body.empId;
+        const itemName = req.body.itemName.toLowerCase();
+        const employeeName = req.body.employeeName.toLowerCase();
         const quantity = req.body.quantity;
         const location = req.body.location;
-        const response = yield (0, defectiveInventoryModel_1.addDefectiveItem)(itemId, empId, quantity, location);
-        if (response) {
-            res.status(response.code).json(response);
+        try {
+            const item = (0, itemModel_1.readItemByName)(itemName, location);
+            const response = yield (0, defectiveInventoryModel_1.addDefectiveItem)(itemId, empId, quantity, location);
+            if (response) {
+                return res.status(response.code).json(response);
+            }
+        }
+        catch (err) {
         }
     });
 }

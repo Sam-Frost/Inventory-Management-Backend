@@ -23,6 +23,28 @@ export async function readUniqueItem(itemId: number) {
     }
 }
 
+export async function readItemByName(itemName: string, location: string) {
+    try {
+        const response = await prisma.item.findUnique({
+            where: {
+                unique_location_itemName: {
+                    itemName: itemName,
+                    location: location
+                }
+            }
+        });
+        return {
+            code: 200,
+            data: response
+        };
+    } catch (error) {
+        return {
+            code: 500,
+            data: "Error occured while trying to read data!"
+        };
+    }
+}
+
 export async function readItems(location: string) {
     try {
         const response = await prisma.item.findMany({

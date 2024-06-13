@@ -6,6 +6,11 @@ import * as jwt from 'jsonwebtoken'
 import { HttpStatus } from '../../lib/httpStatusCodes';
 import { IS_COOKIE_SECURE } from '../../constants';
 
+import dotenv from 'dotenv';
+
+// Load environment variables from .env file
+dotenv.config();
+
 export async function adminLogin(req: Request, res: Response) {
     console.log("Login route hit!")
 
@@ -44,8 +49,10 @@ export async function adminLogin(req: Request, res: Response) {
 
             await updateAdminRefreshToken(id, refreshToken)
 
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'    });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'  });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax'    });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax'  });
+            // res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+            // res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
             res.status(response.code).json(accessTokenPayload);
 
         } else {
@@ -91,8 +98,10 @@ export async function adminRegister(req: Request, res: Response) {
 
             const accessToken = generateAccessToken(payload);  
 
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'  });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'   });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax'  });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax'   });
+            // res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+            // res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000   });
       
             res.status(response.code).json(payload);
         

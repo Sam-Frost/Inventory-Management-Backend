@@ -8,12 +8,18 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
         step((generator = generator.apply(thisArg, _arguments || [])).next());
     });
 };
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.userLogout = exports.userAuthenticated = exports.adminRegister = exports.adminLogin = void 0;
 const authenticationModel_1 = require("../Model/authenticationModel");
 const authenticationService_1 = require("../Service/authenticationService");
 const httpStatusCodes_1 = require("../../lib/httpStatusCodes");
 const constants_1 = require("../../constants");
+const dotenv_1 = __importDefault(require("dotenv"));
+// Load environment variables from .env file
+dotenv_1.default.config();
 function adminLogin(req, res) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Login route hit!");
@@ -41,8 +47,10 @@ function adminLogin(req, res) {
                 const accessToken = (0, authenticationService_1.generateAccessToken)(accessTokenPayload);
                 const refreshToken = (0, authenticationService_1.generateRefreshToken)(refreshTokenPayload);
                 yield (0, authenticationModel_1.updateAdminRefreshToken)(id, refreshToken);
-                res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
-                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
+                res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax' });
+                res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax' });
+                // res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+                // res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
                 res.status(response.code).json(accessTokenPayload);
             }
             else {
@@ -78,8 +86,10 @@ function adminRegister(req, res) {
                 name: user.name
             };
             const accessToken = (0, authenticationService_1.generateAccessToken)(payload);
-            res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
-            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none' });
+            res.cookie('accessToken', accessToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax' });
+            res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: constants_1.IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax' });
+            // res.cookie('accessToken', accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+            // res.cookie('refreshToken', refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000   });
             res.status(response.code).json(payload);
         }
     });

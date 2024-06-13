@@ -66,8 +66,10 @@ export const authMiddleware = async (req: Request, res: Response, next: NextFunc
 
 
                 if (response) {
-                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'  });
-                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: 'none'   });
+                    res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax'  });
+                    res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000, sameSite: process.env.NODE_ENV === 'prod' ? 'none' : 'lax'   });
+                    // res.cookie('accessToken', response.accessToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000  });
+                    // res.cookie('refreshToken', response.refreshToken, { httpOnly: true, secure: IS_COOKIE_SECURE, maxAge: 3600000 });
                     // return next();
                     // res.status(201).json({ msg: "Tokens refreshed"})
                     console.log("TOKENS HAVE BEEN SUCCESSSFULLY REFRESHED AND MOVING AHEAD WITH USERS REQUEST")

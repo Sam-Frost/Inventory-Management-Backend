@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assignItemsToEmployee = exports.updateItemQuantity = exports.addItem = exports.readItems = exports.readUniqueItem = void 0;
+exports.assignItemsToEmployee = exports.updateItemQuantity = exports.addItem = exports.readItems = exports.readItemByName = exports.readUniqueItem = void 0;
 const db_1 = require("../../lib/db");
 const assignedItemModel_1 = require("../../AssignedItem/Model/assignedItemModel");
 const items_1 = require("../../utils/items");
@@ -35,6 +35,31 @@ function readUniqueItem(itemId) {
     });
 }
 exports.readUniqueItem = readUniqueItem;
+function readItemByName(itemName, location) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            const response = yield db_1.prisma.item.findUnique({
+                where: {
+                    unique_location_itemName: {
+                        itemName: itemName,
+                        location: location
+                    }
+                }
+            });
+            return {
+                code: 200,
+                data: response
+            };
+        }
+        catch (error) {
+            return {
+                code: 500,
+                data: "Error occured while trying to read data!"
+            };
+        }
+    });
+}
+exports.readItemByName = readItemByName;
 function readItems(location) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
