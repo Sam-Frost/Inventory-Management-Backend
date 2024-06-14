@@ -9,10 +9,8 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.assignItemsToEmployee = exports.updateItemQuantity = exports.addItem = exports.readItems = exports.readItemByName = exports.readUniqueItem = void 0;
+exports.assignItemAndUpdateQuantity = exports.updateAssignedItemAndAvailableQuantity = exports.getItemQuantityById = exports.updateItemQuantity = exports.addItem = exports.readItems = exports.readItemByName = exports.readUniqueItem = void 0;
 const db_1 = require("../../lib/db");
-const assignedItemModel_1 = require("../../AssignedItem/Model/assignedItemModel");
-const items_1 = require("../../utils/items");
 function readUniqueItem(itemId) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
@@ -134,111 +132,204 @@ function updateItemQuantity(itemId, quantity) {
     });
 }
 exports.updateItemQuantity = updateItemQuantity;
-function assignItemsToEmployee(empId, items, location) {
+function getItemQuantityById(itemId) {
+    return __awaiter(this, void 0, void 0, function* () {
+        return yield db_1.prisma.item.findUnique({
+            select: { quantity: true },
+            where: { itemId: itemId },
+        });
+    });
+}
+exports.getItemQuantityById = getItemQuantityById;
+function updateAssignedItemAndAvailableQuantity(row) {
     return __awaiter(this, void 0, void 0, function* () {
         try {
-            console.log("Entering try block");
-            let dbData = [];
-            items.forEach((item) => {
-                dbData.push({
-                    empId,
-                    itemId: item.itemId,
-                    quantity: item.quantity,
-                    location
-                });
-            });
-            // Check if all the items that we want to assign the quantities are less than what we have available
-            yield (0, items_1.checkItemQuantities)(dbData)
-                .then(() => console.log('Quantities checked successfully'))
-                .catch(error => console.error('Error checking quantities:', error));
-            console.log(dbData);
-            let status = [];
-            let statusData = [];
-            console.log("Starting Loop!");
-            for (const row of dbData) {
-                console.log("------ITERATION-----");
-                let response = [];
-                try {
-                    if (yield (0, assignedItemModel_1.checkAssignedItemExists)(row.empId, row.itemId)) {
-                        console.log("Item is already assigned!");
-                        console.log(row);
-                        response = yield db_1.prisma.$transaction([
-                            // Increase the quantity of item assigned to the person
-                            db_1.prisma.assignedItem.update({
-                                data: {
-                                    quantity: {
-                                        increment: row.quantity
-                                    }
-                                },
-                                where: {
-                                    unique_empId_itemID: {
-                                        empId: row.empId,
-                                        itemId: row.itemId
-                                    }
-                                }
-                            }),
-                            // Decrease the quantity of item from total items
-                            db_1.prisma.item.update({
-                                data: {
-                                    quantity: {
-                                        decrement: row.quantity
-                                    }
-                                },
-                                where: {
-                                    itemId: row.itemId
-                                }
-                            })
-                        ]);
-                        console.log("Increased the quantiy");
-                        console.log("Transaction compleated");
+            return yield db_1.prisma.$transaction([
+                // Increase the quantity of item assigned to the person
+                db_1.prisma.assignedItem.update({
+                    data: {
+                        quantity: {
+                            increment: row.quantity
+                        }
+                    },
+                    where: {
+                        unique_empId_itemID: {
+                            empId: row.empId,
+                            itemId: row.itemId
+                        }
                     }
-                    else {
-                        console.log(`Assignment starting for itemId : ${row.empId}`);
-                        console.log(row);
-                        response = yield db_1.prisma.$transaction([
-                            db_1.prisma.assignedItem.create({
-                                data: row
-                            }),
-                            db_1.prisma.assignedItemRecord.create({
-                                data: row
-                            }),
-                            // Decrease the quantity of item from total items
-                            db_1.prisma.item.update({
-                                data: {
-                                    quantity: {
-                                        decrement: row.quantity
-                                    }
-                                },
-                                where: {
-                                    itemId: row.itemId
-                                }
-                            })
-                        ]);
-                        console.log(`Assignment completed for itemId : ${row.empId}`);
-                        console.log("Transaction compleated");
+                }),
+                // Decrease the quantity of item from total items
+                db_1.prisma.item.update({
+                    data: {
+                        quantity: {
+                            decrement: row.quantity
+                        }
+                    },
+                    where: {
+                        itemId: row.itemId
                     }
-                    console.log(response);
-                    statusData.push(response);
-                    status.push(true);
-                }
-                catch (error) {
-                    status.push(false);
-                }
-            }
-            return {
-                code: 201,
-                data: status,
-                finalData: statusData
-            };
+                })
+            ]);
         }
-        catch (error) {
-            console.log("Entering error block");
-            console.log(error);
-            return {
-                code: 500,
-                data: "Unkown database error"
-            };
+        catch (err) {
+            return null;
         }
     });
 }
-exports.assignItemsToEmployee = assignItemsToEmployee;
+exports.updateAssignedItemAndAvailableQuantity = updateAssignedItemAndAvailableQuantity;
+function assignItemAndUpdateQuantity(row) {
+    return __awaiter(this, void 0, void 0, function* () {
+        try {
+            return yield db_1.prisma.$transaction([
+                db_1.prisma.assignedItem.create({
+                    data: row
+                }),
+                db_1.prisma.assignedItemRecord.create({
+                    data: row
+                }),
+                // Decrease the quantity of item from total items
+                db_1.prisma.item.update({
+                    data: {
+                        quantity: {
+                            decrement: row.quantity
+                        }
+                    },
+                    where: {
+                        itemId: row.itemId
+                    }
+                })
+            ]);
+        }
+        catch (err) {
+            return null;
+        }
+    });
+}
+exports.assignItemAndUpdateQuantity = assignItemAndUpdateQuantity;
+/*
+export async function assignItemsToEmployee(empId: number, items: Items, location: string) {
+
+    try {
+        console.log("Entering try block")
+
+        let dbData: { empId: number; itemId: number; quantity: number; location: string; }[] = []
+
+        items.forEach((item) => {
+            dbData.push({
+                empId,
+                itemId: item.itemId,
+                quantity: item.quantity,
+                location
+            })
+        })
+
+        // Check if all the items that we want to assign the quantities are less than what we have available
+        await checkItemQuantities(dbData)
+            .then(() => console.log('Quantities checked successfully'))
+            .catch(error => console.error('Error checking quantities:', error));
+
+
+        console.log(dbData)
+
+        let status: boolean[] = [];
+        let statusData: any[] = [];
+
+        console.log("Starting Loop!")
+        for (const row of dbData) {
+            console.log("------ITERATION-----")
+            let response = [];
+            try {
+
+                if (await checkAssignedItemExists(row.empId, row.itemId)) {
+                    console.log("Item is already assigned!")
+                    console.log(row)
+                    response = await prisma.$transaction([
+                        // Increase the quantity of item assigned to the person
+                        prisma.assignedItem.update({
+                            data: {
+                                quantity: {
+                                    increment: row.quantity
+                                }
+                            },
+                            where: {
+                                unique_empId_itemID: {
+                                    empId: row.empId,
+                                    itemId: row.itemId
+                                }
+                            }
+                        }),
+                        // Decrease the quantity of item from total items
+                        prisma.item.update({
+                            data: {
+                                quantity: {
+                                    decrement: row.quantity
+                                }
+                            },
+                            where: {
+                                itemId: row.itemId
+                            }
+                        })
+                    ])
+                    console.log("Increased the quantiy")
+                    console.log("Transaction compleated")
+
+                } else {
+                    console.log(`Assignment starting for itemId : ${row.empId}`)
+                    console.log(row)
+
+                    response = await prisma.$transaction([
+                        prisma.assignedItem.create({
+                            data: row
+                        }),
+                        prisma.assignedItemRecord.create({
+                            data: row
+                        }),
+                        // Decrease the quantity of item from total items
+                        prisma.item.update({
+                            data: {
+                                quantity: {
+                                    decrement: row.quantity
+                                }
+                            },
+                            where: {
+                                itemId: row.itemId
+                            }
+                        })
+
+                    ])
+                    console.log(`Assignment completed for itemId : ${row.empId}`)
+                    console.log("Transaction compleated")
+
+                }
+
+
+                console.log(response)
+                statusData.push(response)
+                status.push(true)
+
+
+            } catch (error) {
+                status.push(false)
+            }
+
+        }
+
+        return {
+            code: 201,
+            data: status,
+            finalData: statusData
+        };
+
+    } catch (error) {
+        console.log("Entering error block")
+        console.log(error)
+
+        return {
+            code: 500,
+            data: "Unkown database error"
+        }
+    }
+}
+
+*/ 

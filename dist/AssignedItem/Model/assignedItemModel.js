@@ -9,7 +9,7 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
     });
 };
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.checkAssignedItemExists = exports.readItemsAssignedToEmployee = exports.readAssignedItemQuantity = void 0;
+exports.checkIfAssignedItemExists = exports.readItemsAssignedToEmployee = exports.readAssignedItemQuantity = void 0;
 const db_1 = require("../../lib/db");
 function readAssignedItemQuantity(itemId, empId) {
     return __awaiter(this, void 0, void 0, function* () {
@@ -47,13 +47,21 @@ function readItemsAssignedToEmployee(empId) {
     });
 }
 exports.readItemsAssignedToEmployee = readItemsAssignedToEmployee;
-function checkAssignedItemExists(empId, itemId) {
+function checkIfAssignedItemExists(empId, itemId) {
     return __awaiter(this, void 0, void 0, function* () {
         console.log("Checking if assignment exits");
-        const existingItem = yield db_1.prisma.assignedItem.findFirst({
-            where: { empId, itemId },
-        });
-        return !!existingItem; // Convert response to boolean (truthy for existing row)
+        try {
+            const existingItem = yield db_1.prisma.assignedItem.findUnique({
+                where: { unique_empId_itemID: {
+                        empId: empId,
+                        itemId: itemId
+                    } },
+            });
+            return !!existingItem; // Convert response to boolean (truthy for existing row)
+        }
+        catch (err) {
+            return false;
+        }
     });
 }
-exports.checkAssignedItemExists = checkAssignedItemExists;
+exports.checkIfAssignedItemExists = checkIfAssignedItemExists;

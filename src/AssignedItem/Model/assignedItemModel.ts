@@ -36,12 +36,20 @@ export async function readItemsAssignedToEmployee(empId: number) {
     }
 }
 
-export async function checkAssignedItemExists( empId: number, itemId: number ): Promise<boolean> {
+export async function checkIfAssignedItemExists( empId: number, itemId: number ): Promise<boolean> {
     console.log("Checking if assignment exits")
-    const existingItem = await prisma.assignedItem.findFirst({
-      where: { empId, itemId },
-    });
-  
-    return !!existingItem; // Convert response to boolean (truthy for existing row)
+    try {
+
+    const existingItem = await prisma.assignedItem.findUnique({
+        where: { unique_empId_itemID: {
+          empId: empId,
+          itemId: itemId
+        } },
+      });
+    
+      return !!existingItem; // Convert response to boolean (truthy for existing row)
+    } catch (err) {
+        return false
+    }
   }
   

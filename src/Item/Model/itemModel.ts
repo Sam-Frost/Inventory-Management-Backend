@@ -1,8 +1,4 @@
-import { PrismaClientKnownRequestError, PrismaClientValidationError } from '@prisma/client/runtime/library';
 import { prisma } from '../../lib/db';
-import { Items } from '../Controller/itemController';
-import { checkAssignedItemExists } from '../../AssignedItem/Model/assignedItemModel';
-import { checkItemQuantities } from '../../utils/items';
 
 export async function readUniqueItem(itemId: number) {
     try {
@@ -118,7 +114,78 @@ export async function updateItemQuantity(itemId: number, quantity: number) {
     }
 }
 
+export async function getItemQuantityById(itemId: number) {
+    return await prisma.item.findUnique({
+        select: { quantity: true },
+        where: { itemId: itemId },
+    });
+}
 
+export async function updateAssignedItemAndAvailableQuantity(row: { empId: number; itemId: number; quantity: number; location: string; }) {
+    try {
+        return await prisma.$transaction([
+            // Increase the quantity of item assigned to the person
+            prisma.assignedItem.update({
+                data: {
+                    quantity: {
+                        increment: row.quantity
+                    }
+                },
+                where: {
+                    unique_empId_itemID: {
+                        empId: row.empId,
+                        itemId: row.itemId
+                    }
+                }
+            }),
+            // Decrease the quantity of item from total items
+            prisma.item.update({
+                data: {
+                    quantity: {
+                        decrement: row.quantity
+                    }
+                },
+                where: {
+                    itemId: row.itemId
+                }
+            })
+        ])
+    } catch (err) {
+        return null
+    }
+    
+    
+}
+
+export async function assignItemAndUpdateQuantity(row: { empId: number; itemId: number; quantity: number; location: string; }) {
+
+    try {
+        return await prisma.$transaction([
+            prisma.assignedItem.create({
+                data: row
+            }),
+            prisma.assignedItemRecord.create({
+                data: row
+            }),
+            // Decrease the quantity of item from total items
+            prisma.item.update({
+                data: {
+                    quantity: {
+                        decrement: row.quantity
+                    }
+                },
+                where: {
+                    itemId: row.itemId
+                }
+            })
+
+        ])
+    } catch (err) {
+        return null;
+    }
+
+}
+/*
 export async function assignItemsToEmployee(empId: number, items: Items, location: string) {
 
     try {
@@ -242,3 +309,5 @@ export async function assignItemsToEmployee(empId: number, items: Items, locatio
         }
     }
 }
+
+*/
